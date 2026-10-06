@@ -11,6 +11,9 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
 
+      // We will register the service worker manually
+      injectRegister: null,
+
       includeAssets: [
         'pwa-192x192.png',
         'pwa-512x512.png'
@@ -19,6 +22,7 @@ export default defineConfig({
       manifest: {
         name: 'DFA Partition Optimizer',
         short_name: 'DFA Optimizer',
+
         description:
           'Interactive Hopcroft Algorithm Lab for DFA minimization',
 
