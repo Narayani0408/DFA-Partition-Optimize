@@ -22,8 +22,8 @@ npm run dev -- --host 0.0.0.0
 and open the printed network URL (e.g. `http://192.168.x.x:5173`) on a phone on the **same Wi-Fi**. For easy phone access, deploy instead.
 
 ## GitHub Pages (automatic)
-Live site: **https://narayani0408.github.io/DFA-Partition-Optimizer/**
-Every push to `main` runs `.github/workflows/deploy.yml` (npm ci → npm run build → deploy `dist`). One-time setup: repo **Settings → Pages → Build and deployment → Source: GitHub Actions**. (If Pages is set to "Deploy from a branch", GitHub serves the *source* `index.html` and the app stays blank.) The production base path is `/DFA-Partition-Optimizer/`; `npm run dev` still uses `/`.
+Live site: **https://narayani0408.github.io/DFA-Partition-Optimize/**
+Every push to `main` runs `.github/workflows/deploy.yml` (npm ci → npm run build → deploy `dist`). One-time setup: repo **Settings → Pages → Build and deployment → Source: GitHub Actions**. (If Pages is set to "Deploy from a branch", GitHub serves the *source* `index.html` and the app stays blank.) The production base path is `/DFA-Partition-Optimize/`; `npm run dev` still uses `/`.
 
 ## Deploy (Vercel)
 Set the env var `VITE_BASE=/` in the Vercel project (the default base is the GitHub Pages path).
