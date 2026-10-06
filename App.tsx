@@ -1,5 +1,5 @@
 import {useEffect,useMemo,useRef,useState} from 'react';
-import {sound,SoundSettings} from './audio/soundManager';
+import {sound,SoundSettings} from './soundManager';
 import ResultPanel from './ResultPanel';
 import {DFA,EXAMPLES,minimize,validateDFA,verify,Block} from './algorithm';
 import DFAGraph from './DFAGraph';
