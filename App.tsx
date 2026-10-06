@@ -4,12 +4,15 @@ import ResultPanel from './ResultPanel';
 import {DFA,EXAMPLES,minimize,validateDFA,verify,Block} from './algorithm';
 import DFAGraph from './DFAGraph';
 import {PAL} from './DFAGraph';
+
 const fmt=(b:string[])=>'{'+b.join(', ')+'}';
 const dl=(n:string,t:string,m:string)=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:m}));a.download=n;a.click();};
 const useCount=(to:number,on:boolean)=>{const [v,setV]=useState(0);useEffect(()=>{if(!on){setV(0);return;}let f=0;const t=setInterval(()=>{f++;setV(to*Math.min(1,f/30));if(f>=30)clearInterval(t);},30);return()=>clearInterval(t);},[to,on]);return v;};
+
 function Table({d,label}:{d:DFA;label?:(s:string)=>string}){const L=label??((s:string)=>s);
   return <div className="scroll"><table><thead><tr><th>State</th>{d.alphabet.map(a=><th key={a}>{a}</th>)}</tr></thead><tbody>
-  {d.states.map(s=><tr key={s}><td>{s===d.startState?'→ ':''}{d.finalStates.includes(s)?'* ':''}{L(s)}</td>{d.alphabet.map(a=><td key={a}>{L(d.transitions[s][a])}</td>)}</tr>)}</tbody></table></div>;}
+  {d.states.map(s=><tr key={s}><td>{s===d.startState?'→ ':''}{d.finalStates.includes(s)?'* ':''}{L(s)}</td>{d.alphabet.map(a=><td key={a}>{L(d.transitions[s][a])}</td>)}</tr>)}</tbody></table></div>;} 
+
 export default function App(){
   const [dark,setDark]=useState(()=>localStorage.getItem('dfa-theme')!=='light');
   const [view,setView]=useState<'home'|'lab'|'how'|'about'>('home');
@@ -44,7 +47,7 @@ export default function App(){
   const pct=dfa&&res?100*(dfa.states.length-res.min.states.length)/dfa.states.length:0;
   const cStates=useCount(res?.min.states.length??0,done),cPct=useCount(pct,done);
   const whyText=step&&step.splits.length?step.splits.map(s=>`${fmt(s.after[0])} reach the splitter on "${step.symbol}" while ${fmt(s.after[1])} do not, so they behave differently on some input string and can no longer share a class.`).join(' '):'Two states stay together only while they behave identically on every symbol. Here X cut no block, so no new distinction was found.';
-  const csv=()=>res&&dl('minimized_dfa.csv',['State,'+res.min.alphabet.join(','),...res.min.states.map(s=>[s,...res.min.alphabet.map(a=>res.min.transitions[s][a])].join(','))].join('\n'),'text/csv');
+  const csv=()=>{if(!res)return;const rows=['State,'+res.min.alphabet.join(','),...res.min.states.map(s=>[s,...res.min.alphabet.map(a=>res.min.transitions[s][a])].join(','))];dl('minimized_dfa.csv',rows.join('\n'),'text/csv');};
   const exportAll=()=>res&&dfa&&dl('dfa_report.json',JSON.stringify({original:dfa,reachable:res.reachable,unreachable:res.unreachable,partitions:res.partition,mapping:res.mapping,minimized:res.min,trace:res.steps},null,2),'application/json');
   const first=useRef(true);
   useEffect(()=>{if(first.current){first.current=false;return;}if(!step)return;const ts:number[]=[];const at=(ms:number,n:string)=>ts.push(window.setTimeout(()=>sound.play(n),ms));
@@ -72,7 +75,7 @@ export default function App(){
       <textarea aria-label="DFA JSON" value={text} onChange={e=>setText(e.target.value)} spellCheck={false}/>
       {errors.length>0&&<ul className="err" role="alert">{errors.map((e,k)=><li key={k}>✕ {e}</li>)}</ul>}
       <div className="row"><button className="primary" onClick={()=>run()}>Validate &amp; Load</button><button onClick={demo}>Demo mode</button><button onClick={()=>dl('dfa.json',text,'application/json')}>Export JSON</button></div></aside>
-    <section className="glass pad center p-viz">{res&&dfa&&step?<>
+    <section className="glass pad center p-viz">{res&&dfa&&step?<> 
       <div className="row ctl"><button onClick={()=>setI(Math.max(0,i-1))} title="← Previous">◀</button><button className="primary" onClick={()=>{if(i>=last){setI(0);setDone(false);}setPlay(!play);}}>{play?'❚❚ Pause':'▶ Play'}</button><button onClick={()=>setI(Math.min(last,i+1))} title="→ Next">▶</button>
         <button onClick={()=>{setI(0);setPlay(false);setDone(false);}}>Restart</button><button onClick={()=>setI(last)}>Final</button>
         <label>Speed <select value={speed} onChange={e=>setSpeed(+e.target.value)}>{[.5,1,1.5,2].map(s=><option key={s} value={s}>{s}x</option>)}</select></label>
@@ -81,7 +84,7 @@ export default function App(){
       <p className="legend">◉ amber pulse = splitter · green pulse = predecessors X · dashed ring = final · node colour = partition class · Space/←/→/R</p>
       <h4>Partition (step {i+1} of {res.steps.length})</h4><div className="row">{step.partition.map((b,k)=><div key={b.join()} className={'bub'+(isNew(b)?' new':'')} style={{borderColor:PAL[k%PAL.length]}}><small>{nm(k)}{isNew(b)?' ✂ NEW':''}</small><div className="mono">{b.map(s=><span key={s} className="chip" style={{background:PAL[k%PAL.length]+'44'}}>{s}</span>)}</div></div>)}</div>
     </>:<p className="muted">Load a DFA to begin — or click Demo mode.</p>}</section>
-    <aside className="glass pad p-algo">{res&&step?<>
+    <aside className="glass pad p-algo">{res&&step?<> 
       <h3>Hopcroft engine</h3><div className="mono kv"><div>Step <b>{String(i+1).padStart(2,'0')}/{res.steps.length}</b></div>
       <div>Splitter <b>{step.splitter?fmt(step.splitter):'—'}</b></div><div>Symbol <b>{step.symbol??'—'}</b></div><div>X <b>{step.X?fmt(step.X):'—'}</b></div>
       <div>Result <b>{step.splits.length?step.splits.map(s=>s.after.map(fmt).join(' + ')).join('; '):'no split'}</b></div></div>
@@ -90,7 +93,7 @@ export default function App(){
       <button onClick={()=>setWhy(!why)}>{why?'Hide':'WHY?'}</button>{why&&<div className="hl why">{whyText}</div>}
       {res.unreachable.length>0&&<p className="warnt">Unreachable removed: {fmt(res.unreachable)}</p>}</>:null}</aside>
     {res&&<footer className="glass pad tl p-algo"><div className="row">{res.steps.map((s,k)=><button key={k} className={'tick'+(k===i?' on':'')+(k<i?' past':'')} onClick={()=>{setI(k);setPlay(false);}}>{s.action==='INIT'?'Init':s.action==='DONE'?'Final':`${s.splitter?fmt(s.splitter):''}·${s.symbol}`}</button>)}</div></footer>}
-    {res&&dfa&&<ResultPanel dfa={dfa} res={res} sel={sel} setSel={setSel} v={v} csv={csv} exportAll={exportAll}/>}
+    {res&&dfa&&<ResultPanel dfa={dfa} res={res} sel={sel} setSel={setSel} v={v} csv={csv} exportAll={exportAll}/>} 
   </main></>}
   {done&&res&&dfa&&<div className="overlay" role="dialog"><div className="glass pad result"><div className="ok">✓ MINIMIZATION COMPLETE</div>
     <div className="big2">{dfa.states.length} → {Math.round(cStates)}</div><div className="big2 ok">{cPct.toFixed(2)}% STATE REDUCTION</div>
@@ -101,4 +104,5 @@ export default function App(){
     <div className={v.length?'err':'ok'}>{v.length?'✕ Verification failed: '+v.join(' '):'✓ Minimized DFA is valid'}</div>
     <div className="row"><button className="primary" onClick={()=>{setDone(false);setI(0);setPlay(true);}}>↻ Replay</button><button onClick={csv}>CSV</button><button onClick={()=>dl('minimized_dfa.json',JSON.stringify(res.min,null,2),'application/json')}>JSON</button>
       <button onClick={()=>navigator.clipboard?.writeText(res.min.states.map(s=>[s,...res.min.alphabet.map(a=>res.min.transitions[s][a])].join('\t')).join('\n'))}>Copy</button><button onClick={()=>window.print()}>Print</button><button onClick={()=>setDone(false)}>Close</button></div></div></div>}
-  <footer className="foot">Built for Theory of Automata · Hopcroft's DFA Minimization · Educational use.</footer></div>;}
+  <footer className="foot">Built for Theory of Automata · Hopcroft's DFA Minimization · Educational use.</footer></div>;
+}
