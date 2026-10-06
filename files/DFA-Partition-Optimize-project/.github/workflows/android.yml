@@ -1,0 +1,49 @@
+name: Build Android APK
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - uses: gradle/actions/setup-gradle@v4
+      - run: npm ci
+      - name: Build web app (relative base for the Android WebView)
+        run: npm run build:android
+      - run: npx cap sync android
+      - name: Build debug APK (installable)
+        working-directory: android
+        run: chmod +x gradlew && ./gradlew assembleDebug --no-daemon
+      - name: Build AAB (unsigned release bundle)
+        working-directory: android
+        continue-on-error: true
+        run: ./gradlew bundleRelease --no-daemon
+      - name: Collect outputs
+        run: |
+          mkdir -p out
+          cp android/app/build/outputs/apk/debug/app-debug.apk out/DFA-Partition-Optimizer.apk
+          cp android/app/build/outputs/bundle/release/app-release.aab out/DFA-Partition-Optimizer.aab || true
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DFA-Partition-Optimizer-android
+          path: out/*
+      - name: Publish to Releases (easy phone download)
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: android-latest
+          name: Android build (latest)
+          body: Install DFA-Partition-Optimizer.apk on your Android phone (allow "install unknown apps" once).
+          files: out/*
+          make_latest: false
