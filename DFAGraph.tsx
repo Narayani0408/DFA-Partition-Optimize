@@ -1,10 +1,8 @@
 import {useRef,useState,PointerEvent as PE} from 'react';
 import {DFA} from './algorithm';
-
 export type Hi={splitter?:string[];X?:string[];symbol?:string};
 export const PAL=['#6366f1','#22c55e','#f59e0b','#ec4899','#06b6d4','#a855f7','#ef4444','#84cc16'];
 const W=560,H=420,R=24;
-
 export default function DFAGraph({dfa,hi,colors,id}:{dfa:DFA;hi?:Hi;colors?:Record<string,number>;id:string}){
   const [vw,setVw]=useState({z:1,x:0,y:0});const pts=useRef(new Map<number,[number,number]>());const pd=useRef(0);
   const zoomBy=(f:number)=>setVw(v=>{const z=Math.min(4,Math.max(.5,v.z*f));return {z,x:v.x+W/v.z/2-W/z/2,y:v.y+H/v.z/2-H/z/2};});
@@ -48,5 +46,4 @@ export default function DFAGraph({dfa,hi,colors,id}:{dfa:DFA;hi?:Hi;colors?:Reco
         {dfa.finalStates.includes(s)&&<circle cx={x} cy={y} r={R-5} fill="none" stroke={col} strokeWidth="2"/>}
         <text x={x} y={y} textAnchor="middle" dominantBaseline="middle" className="nlabel">{s}</text>
         {s===dfa.startState&&<g><path d={`M${x-R-34},${y} L${x-R-3},${y}`} stroke="currentColor" strokeWidth="2" markerEnd={`url(#${id}a)`}/><text x={x-R-36} y={y-8} textAnchor="end" className="elabel">START</text></g>}</g>;})}
-  </svg><div className="zc"><button aria-label="Zoom in" onClick={()=>zoomBy(1.25)}>+</button><button aria-label="Zoom out" onClick={()=>zoomBy(.8)}>−</button><button aria-label="Fit and reset view" onClick={()=>setVw({z:1,x:0,y:0})}>Fit</button></div></div>;
-}
+  </svg><div className="zc"><button aria-label="Zoom in" onClick={()=>zoomBy(1.25)}>+</button><button aria-label="Zoom out" onClick={()=>zoomBy(.8)}>−</button><button aria-label="Fit and reset view" onClick={()=>setVw({z:1,x:0,y:0})}>Fit</button></div></div>;}

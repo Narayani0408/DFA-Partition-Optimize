@@ -1,6 +1,5 @@
 import {DFA,Result} from './algorithm';
 const fmt=(b:string[])=>'{'+b.join(', ')+'}';
-
 export default function ResultPanel({dfa,res,sel,setSel,v,csv,exportAll}:{dfa:DFA;res:Result;sel:string|null;setSel:(s:string|null)=>void;v:string[];csv:()=>void;exportAll:()=>void}){
   const m=res.min,okFin=res.reachable.every(s=>m.finalStates.includes(res.mapping[s])===dfa.finalStates.includes(s));
   const okTr=m.states.every(s=>m.alphabet.every(a=>m.states.includes(m.transitions[s]?.[a])));
@@ -15,5 +14,4 @@ export default function ResultPanel({dfa,res,sel,setSel,v,csv,exportAll}:{dfa:DF
     <div className="row mono">{Object.entries(res.mapping).map(([s,c])=><span key={s} className="chip">{s} → {c}</span>)}</div>
     <h4>Verification</h4><ul className="checks">{checks.map(([ok,t])=><li key={t} className={ok?'ok':'err'}>{ok?'✓':'✕'} {t}</li>)}</ul>
     {v.length>0&&<p className="err">{v.join(' ')}</p>}
-    <div className="row"><button onClick={csv}>Export CSV</button><button onClick={exportAll}>Export full JSON</button></div></section>;
-}
+    <div className="row"><button onClick={csv}>Export CSV</button><button onClick={exportAll}>Export full JSON</button></div></section>;}
