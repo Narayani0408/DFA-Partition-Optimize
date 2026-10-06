@@ -1,9 +1,55 @@
-import {defineConfig,loadEnv} from 'vite';import react from '@vitejs/plugin-react';
-// Production build is served from https://narayani0408.github.io/DFA-Partition-Optimize/
-// Dev server stays at '/'. For Vercel/Netlify (root domain) build with: VITE_BASE=/ npm run build
-export default defineConfig(({command,isPreview,mode})=>{
-  const env=loadEnv(mode,'.','VITE_');
-  return {
-    base:env.VITE_BASE??(command==='build'||isPreview?'/DFA-Partition-Optimize/':'/'),
-    plugins:[react()],server:{host:true}};
-});
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import { VitePWA } from 'vite-plugin-pwa'
+
+export default defineConfig({
+  base: '/DFA-Partition-Optimize/',
+
+  plugins: [
+    react(),
+
+    VitePWA({
+      registerType: 'autoUpdate',
+
+      // We will register the service worker manually
+      injectRegister: null,
+
+      includeAssets: [
+        'pwa-192x192.png',
+        'pwa-512x512.png'
+      ],
+
+      manifest: {
+        name: 'DFA Partition Optimizer',
+        short_name: 'DFA Optimizer',
+
+        description:
+          'Interactive Hopcroft Algorithm Lab for DFA minimization',
+
+        start_url: '/DFA-Partition-Optimize/',
+        scope: '/DFA-Partition-Optimize/',
+
+        display: 'standalone',
+        orientation: 'portrait',
+
+        theme_color: '#0f172a',
+        background_color: '#0f172a',
+
+        icons: [
+          {
+            src: '/DFA-Partition-Optimize/pwa-192x192.png',
+            sizes: '192x192',
+            type: 'image/png',
+            purpose: 'any'
+          },
+          {
+            src: '/DFA-Partition-Optimize/pwa-512x512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'any maskable'
+          }
+        ]
+      }
+    })
+  ]
+})

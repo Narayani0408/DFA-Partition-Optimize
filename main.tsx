@@ -1,3 +1,11 @@
+/// <reference types="vite/client" />
+/// <reference types="vite-plugin-pwa/client" />
+
+import { registerSW } from 'virtual:pwa-register'
+
+registerSW({
+  immediate: true
+})
 import {Component,ReactNode} from 'react';
 import {createRoot} from 'react-dom/client';import App from './App';import './style.css';
 // Shows the real error on screen instead of a blank white page.
