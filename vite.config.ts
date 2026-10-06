@@ -1,6 +1,36 @@
-import {defineConfig} from 'vite';import react from '@vitejs/plugin-react';
-// Production build is served from https://narayani0408.github.io/DFA-Partition-Optimize/
-// Dev server stays at '/'. For Vercel/Netlify (root domain) build with: VITE_BASE=/ npm run build
-export default defineConfig(({command,isPreview})=>({
-  base:process.env.VITE_BASE??(command==='build'||isPreview?'/DFA-Partition-Optimize/':'/'),
-  plugins:[react()],server:{host:true}}));
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import { VitePWA } from 'vite-plugin-pwa'
+
+export default defineConfig({
+  plugins: [
+    react(),
+
+    VitePWA({
+      registerType: 'autoUpdate',
+
+      manifest: {
+        name: 'DFA Partition Optimizer',
+        short_name: 'DFA Optimizer',
+        description: 'Interactive Hopcroft Algorithm Lab',
+        theme_color: '#0f172a',
+        background_color: '#0f172a',
+        display: 'standalone',
+        orientation: 'portrait',
+
+        icons: [
+          {
+            src: '/pwa-192x192.png',
+            sizes: '192x192',
+            type: 'image/png'
+          },
+          {
+            src: '/pwa-512x512.png',
+            sizes: '512x512',
+            type: 'image/png'
+          }
+        ]
+      }
+    })
+  ]
+})
